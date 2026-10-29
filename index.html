@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Job Application Demo</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f2f5fa;margin:0;color:#1d2939}.top{background:#17365d;color:white;padding:24px;text-align:center}
+.wrap{max-width:760px;margin:28px auto;padding:0 14px}.note{background:#eaf2ff;border:1px solid #c8d9fa;padding:12px;border-radius:8px;margin-bottom:16px}
+.card{background:white;padding:24px;border-radius:12px;box-shadow:0 5px 20px #15294a12}h2{margin-top:0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+label{display:block;font-size:14px;font-weight:bold;margin-bottom:6px}input,select{width:100%;box-sizing:border-box;padding:11px;border:1px solid #cbd5e1;border-radius:7px;font-size:15px;background:white}
+button{padding:12px 18px;border:0;border-radius:7px;cursor:pointer;font-weight:bold;margin:18px 8px 0 0}.submit{background:#2457c5;color:white}.clear{background:#e8edf4;color:#243247}
+#message{display:none;margin-top:18px;padding:12px;border-radius:8px}#message.ok{display:block;background:#eafff0;border:1px solid #a8dbb8;color:#14532d}#message.err{display:block;background:#fff0f0;border:1px solid #efb1b1;color:#8a2020}
+.small{font-size:12px;color:#667085;margin-top:16px}@media(max-width:560px){.grid{grid-template-columns:1fr}.card{padding:17px}}
+</style></head>
+<body>
+<header class="top"><h1>Job Application Demo Form</h1><div>AgentiX browser automation practice</div></header>
+<main class="wrap">
+<div class="note"><b>Demo only:</b> Submissions are sent to the hosted demo server. Use dummy data only.</div>
+<section class="card"><h2>Candidate Details</h2>
+<form id="f"><div class="grid">
+<div><label for="cid">Candidate ID *</label><input id="cid" name="Candidate_ID" required placeholder="CAND-1001"></div>
+<div><label for="name">Full Name *</label><input id="name" name="Full_Name" required placeholder="Full name"></div>
+<div><label for="email">Email *</label><input id="email" name="Email" type="email" required placeholder="name@example.com"></div>
+<div><label for="phone">Phone *</label><input id="phone" name="Phone" type="tel" required placeholder="Phone number"></div>
+<div><label for="position">Position *</label><select id="position" name="Position" required><option value="">Select position</option><option>Python Automation Intern</option><option>QA Automation Intern</option><option>Data Analyst Intern</option><option>Software Developer Intern</option><option>RPA Developer Intern</option></select></div>
+<div><label for="exp">Experience (years) *</label><input id="exp" name="Experience_Years" type="number" min="0" max="50" step="1" required placeholder="0"></div>
+<div><label for="loc">Location *</label><select id="loc" name="Location" required><option value="">Select location</option><option>Pune</option><option>Mumbai</option><option>Nashik</option><option>Kolhapur</option><option>Bengaluru</option><option>Hyderabad</option><option>Chennai</option><option>Remote</option><option>Other</option></select></div>
+<div><label for="avail">Availability *</label><select id="avail" name="Availability" required><option value="">Select availability</option><option>Immediate</option><option>Within 15 days</option><option>Within 30 days</option><option>More than 30 days</option></select></div>
+<div><label for="source">Source (optional)</label><select id="source" name="Source"><option value="">Select source</option><option>Campus</option><option>Job Portal</option><option>Referral</option><option>Company Website</option><option>Social Media</option><option>Other</option></select></div>
+</div><button class="submit" id="submitBtn" type="submit">Submit Demo Application</button><button class="clear" type="reset">Clear</button></form>
+<div id="message" role="status" aria-live="polite"></div>
+<div class="small">Demo form • Submission details are stored by the server and are not shown on this page.</div>
+</section></main>
+<script>
+const form=document.getElementById('f'), message=document.getElementById('message'), submitBtn=document.getElementById('submitBtn');
+form.addEventListener('submit',async e=>{
+ e.preventDefault(); if(!form.reportValidity()) return;
+ submitBtn.disabled=true; submitBtn.textContent='Submitting...'; message.className=''; message.style.display='none';
+ try{
+  const response=await fetch('/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(form).entries()))});
+  const data=await response.json();
+  if(response.ok && data.status==='SUCCESS'){message.textContent='Demo application recorded successfully.';message.className='ok';form.reset();}
+  else if(data.status==='DUPLICATE'){message.textContent='This Candidate ID was already submitted. Duplicate attempt recorded.';message.className='err';}
+  else{message.textContent='Submission failed. Please try again or check the server logs.';message.className='err';}
+  message.style.display='block';
+ }catch(err){message.textContent='Cannot connect to the server. Please try again.';message.className='err';message.style.display='block';}
+ finally{submitBtn.disabled=false;submitBtn.textContent='Submit Demo Application';}
+});
+form.addEventListener('reset',()=>{message.className='';message.style.display='none';message.textContent='';});
+</script></body></html>
